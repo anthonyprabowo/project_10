@@ -10,7 +10,7 @@ export default class Courses extends React.Component {
   }
   getAllCourses = async () => {
     const { context } = this.props
-    const allCourses = await context.actions.getCourses();
+    const allCourses = await context.actions.getCourses(); 
     if(allCourses !== null) {
       this.setState(() => {
         return {

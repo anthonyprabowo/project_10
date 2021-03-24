@@ -21,6 +21,7 @@ export class Provider extends Component {
       data: this.data,
       actions: {
         getCourses: this.getCourses,
+        getCourse: this.getCourse,
         signIn: this.signIn,
         signOut: this.signOut,
       }
@@ -35,6 +36,15 @@ export class Provider extends Component {
   getCourses = async () => {
     const allCourses = await this.data.getAllCourse();
     return allCourses["course"]
+  }
+
+  getCourse = async (id) => {
+    const getCourse = await this.data.getCourse(id);
+    return getCourse["course"][0]
+  }
+
+  getAssociatedUser = async (id) => {
+    
   }
 
   signIn = async (emailAddress, password) => {

@@ -35,6 +35,15 @@ export default class Data {
       throw new Error();
     }
   }
+
+  async getCourse(id) {
+    const response = await this.getData(`/courses/${id}`, 'GET', null)
+    if(response.status === 200) {
+      return response.json().then(data => data)
+    } else {
+      throw new Error();
+    }
+  }
   
   async createUser(user) {
     const response = await this.getData('/users', 'POST', user)
