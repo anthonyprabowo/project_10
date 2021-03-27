@@ -11,6 +11,7 @@ export class Provider extends Component {
     this.data = new Data();
     this.state = {
       authenticatedUser: cookies.getJSON('user') || null,
+      currentPassword: '',
     }
   }
 
@@ -20,6 +21,7 @@ export class Provider extends Component {
       authenticatedUser,
       data: this.data,
       actions: {
+        updateCourse: this.updateCourse,
         getCourses: this.getCourses,
         getCourse: this.getCourse,
         signIn: this.signIn,
@@ -43,13 +45,16 @@ export class Provider extends Component {
     return getCourse["course"][0]
   }
 
-  getAssociatedUser = async (id) => {
-    
+  updateCourse = async (id, body) => {
+    const {authenticatedUser} = this.state
+    const updateCourse = await this.data.updateCourse(id, body, authenticatedUser.user.emailAddress, authenticatedUser.password)
+    return updateCourse
   }
 
   signIn = async (emailAddress, password) => {
     const user = await this.data.getUser(emailAddress, password);
     if(user !== null) {
+      user.password = password
       this.setState(() => {
         return {
           authenticatedUser: user

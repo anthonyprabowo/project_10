@@ -32,7 +32,7 @@ export default class UserSignUp extends React.Component {
           <label htmlFor="confirmPassword">Confirm Password</label>
           <input onChange={this.change} type="password" id="confirmPassword" name="confirmPassword" />
           <button className="button" type="submit">Sign Up</button>
-          <button className="button button-secondary">Cancel</button>
+          <button className="button button-secondary" onClick={this.cancel}>Cancel</button>
         </form>
         <p>Already have a user account? Click here to <Link to="/signin">sign in!</Link></p>
       </div>
@@ -69,14 +69,18 @@ export default class UserSignUp extends React.Component {
             console.log(errors);
             this.setState({errors})
           } else {
-            this.props.history.push('/courses');
+            context.actions.signIn(email, password);
+            this.props.history.push('/');
           }
         })
     } else {
       alert('Password and Confirmed Password does not match');
     }
-
-    
+  }
+  
+  cancel = (e) => {
+    e.preventDefault();
+    this.props.history.push('/');
   }
 }
 

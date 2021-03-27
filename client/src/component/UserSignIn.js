@@ -28,7 +28,7 @@ export default class UserSignIn extends React.Component {
           <label htmlFor="password">Password</label>
           <input onChange={this.change} type="password" id="password" name="password" />
           <button className="button" type="submit">Sign In</button>
-          <button className="button button-secondary">Cancel</button>
+          <button className="button button-secondary" onClick={this.cancel}>Cancel</button>
         </form>
         <p>Don't have a user account? Click here to <Link to="/signup">sign up!</Link></p>
       </div>
@@ -69,6 +69,11 @@ export default class UserSignIn extends React.Component {
         this.props.history.push('/error')
       })
 
+  }
+
+  cancel = (e) => {
+    e.preventDefault();
+    this.props.history.push('/');
   }
 }
 

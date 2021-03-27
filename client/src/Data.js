@@ -36,10 +36,43 @@ export default class Data {
     }
   }
 
+  async createCourse(course, emailAddress, password) {
+    const response = await this.getData('/courses', 'POST', course, true, {username: emailAddress, password})
+    if(response.status === 201) {
+      return []
+    } else if(response.status === 400) {
+      return response.json().then(data => data.error)
+    } else {
+      throw new Error();
+    }
+  }
+
   async getCourse(id) {
     const response = await this.getData(`/courses/${id}`, 'GET', null)
     if(response.status === 200) {
       return response.json().then(data => data)
+    } else {
+      throw new Error();
+    }
+  }
+
+  async updateCourse(id, body, emailAddress, password) {
+    const response = await this.getData(`/courses/${id}`, 'PUT', body, true,{username: emailAddress, password})
+    if(response.status === 204) {
+      return null
+    } else if(response.status === 400) {
+      return response.json().then(data => data.message)
+    }else {
+      throw new Error();
+    }
+  }
+
+  async deleteCourse(id, emailAddress, password) {
+    const response = await this.getData(`/courses/${id}`, 'DELETE', null, true, {username: emailAddress, password}) 
+    if(response.status === 204) {
+      return null
+    } else if(response.status === 400) {
+      return response.json().then(data => data.message)
     } else {
       throw new Error();
     }

@@ -1,5 +1,6 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
 
 export default class CourseDetail extends React.Component {
   constructor() {
@@ -7,8 +8,7 @@ export default class CourseDetail extends React.Component {
     this.state = {
       data: {},
       user: {},
-      paragraphs: [],
-      materials: [],
+      currentUser: {}
     }
   }
 
@@ -16,15 +16,21 @@ export default class CourseDetail extends React.Component {
     const { context } = this.props
     const { id } = this.props.match.params
     const data = await context.actions.getCourse(id);
-    const user = await data.associatedUser
-    this.setState(() => {
-      return {
-        data,
-        user,
-        paragraphs: data.description.split(/\r?\n/),
-        materials: data.materialsNeeded !== null ? data.materialsNeeded.replaceAll('*', '').split(/\r?\n/) : []
-      }
-    })
+    if(data) {
+      const user = await data.associatedUser
+      this.setState(() => {
+        return {
+          data,
+          user,
+          paragraphs: data.description,
+          materials: data.materialsNeeded !== null ? data.materialsNeeded : null,
+          currentUser: context.authenticatedUser,
+          errors: {},
+        }
+      })
+    } else {
+      this.props.history.push('/notfound');
+    }
   }
 
   componentDidMount() {
@@ -32,15 +38,23 @@ export default class CourseDetail extends React.Component {
   }
 
   render(){
-    const { data, user, paragraphs, materials } = this.state;
+    const { data, user } = this.state;
+    const { context } = this.props;
+    const currentUser = context.authenticatedUser;
     return(
       <main>
         <div className="actions--bar">
-          <div className="wrap">
-            <Link className="button" to='/update'>Update Course</Link>
-            <Link className="button" to='/delete'>Delete Course</Link>
-            <Link className="button button-secondary" to='/course'>Return to List</Link>
-          </div>
+            {
+              currentUser !== null && currentUser.user.emailAddress === user.emailAddress ? 
+              <div className="wrap">
+                <Link className="button" to={`/courses/${data.id}/update`}>Update Course</Link>
+                <button className="button" onClick={this.delete}>Delete Course</button>
+                <Link className="button button-secondary" to='/courses'>Return to List</Link>
+              </div> :
+              <div className="wrap">
+                <Link className="button button-secondary" to='/courses'>Return to List</Link>
+              </div>
+            }
         </div>
         <div className ="wrap">
           <h2>Course Detail</h2>
@@ -50,14 +64,14 @@ export default class CourseDetail extends React.Component {
                 <h3 className="course--detail--title">Course</h3>
                 <h4 className="course--name">{data.title}</h4>
                 <p>{`By ${user.firstName} ${user.lastName}`}</p>
-                {paragraphs.map((paragraph,i) => <p key={i}>{paragraph}</p>)}
+                <ReactMarkdown source={data.description} />
               </div>
               <div>
                 <h3 className="course--detail--title">Estimated Time</h3>
                 <p>{data.estimatedTime !== null ? data.estimatedTime : null}</p>
                 <h3 className="course--detail--title">Materials Needed</h3>
                 <ul className="course--detail--list">
-                  {materials.map((material,i) => i === materials.length - 1 ? null : <li key={i}>{material}</li>)}
+                  <ReactMarkdown source={data.materialsNeeded} />
                 </ul>
               </div>
             </div>
@@ -66,6 +80,25 @@ export default class CourseDetail extends React.Component {
       </main>
       
     )
+  }
+
+  delete = () => {
+    const {currentUser} = this.state;
+    const {id} = this.props.match.params;
+    const {context} = this.props;
+    console.log(currentUser.user.emailAddress);
+    context.data.deleteCourse(id, currentUser.user.emailAddress, currentUser.password)
+      .then(arr => {
+        if(arr !== null) {
+          this.props.history.push('/forbidden');
+        } else {
+          this.props.history.push('/')
+        }
+      })
+      .catch(err => {
+        console.error(err)
+        this.props.history.push('/error')
+      })
   }
 }
 
