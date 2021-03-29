@@ -73,6 +73,10 @@ export default class UserSignUp extends React.Component {
             this.props.history.push('/');
           }
         })
+        .catch(err => {
+          console.error(err);
+          this.props.history.push('/error');
+        });
     } else {
       alert('Password and Confirmed Password does not match');
     }

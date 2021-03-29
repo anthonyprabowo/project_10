@@ -18,22 +18,29 @@ export default class UpdateCourse extends React.Component {
     const { context } = this.props
     const { id } = this.props.match.params
     const data = await context.actions.getCourse(id);
-    const user = await data.associatedUser
-    const currentUser = context.authenticatedUser;
-    if(user.id === currentUser.user.id) {
-      this.setState(() => {
-        return {
-          courseTitle: data.title,
-          courseAuthor: `${user.firstName} ${user.lastName}`,
-          courseDescription: data.description,
-          estimatedTime: data.estimatedTime,
-          materialsNeeded: data.materialsNeeded,
-          user
-        }
-      })
+    console.log(data);
+    if(data === undefined) {
+      this.props.history.push('/notfound')
     } else {
-      this.props.history.push('/forbidden');
+      const user = await data.associatedUser
+      const currentUser = context.authenticatedUser;
+      
+      if(user.id === currentUser.user.id) {
+        this.setState(() => {
+          return {
+            courseTitle: data.title,
+            courseAuthor: `${user.firstName} ${user.lastName}`,
+            courseDescription: data.description,
+            estimatedTime: data.estimatedTime,
+            materialsNeeded: data.materialsNeeded,
+            user
+          }
+        })
+      } else {
+        this.props.history.push('/forbidden');
+      }
     }
+    
   }
 
   componentDidMount() {
@@ -46,6 +53,11 @@ export default class UpdateCourse extends React.Component {
       <main>
         <div className="wrap">
           <h2>Update Course</h2>
+          {
+            this.state.errors.length > 0 ? 
+            <ErrorsDisplay errors={this.state.errors} />:
+            null
+          }
           <form onSubmit={this.submit}>
             <div className="main--flex">
               <div>
@@ -118,4 +130,21 @@ export default class UpdateCourse extends React.Component {
     const {from} = this.props.location.state || {from: {pathname: `/courses/${id}`}}
     this.props.history.push(from)
   }
+}
+
+function ErrorsDisplay({ errors }) {
+  let errorDisplay = null;
+
+  if(errors.length) {
+    errorDisplay = (
+      <div className="validation--errors">
+        <h3>Validation Error</h3>
+        <ul>
+          {errors.map((error, i) => <li key={i}>{error}</li>) }
+        </ul>
+      </div>
+    )
+  }
+  
+  return errorDisplay;
 }
