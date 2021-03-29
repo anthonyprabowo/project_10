@@ -18,7 +18,6 @@ export default class UpdateCourse extends React.Component {
     const { context } = this.props
     const { id } = this.props.match.params
     const data = await context.actions.getCourse(id);
-    console.log(data);
     if(data === undefined) {
       this.props.history.push('/notfound')
     } else {
