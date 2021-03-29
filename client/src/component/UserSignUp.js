@@ -5,7 +5,8 @@ export default class UserSignUp extends React.Component {
   constructor() {
     super()
     this.state = {
-      name: '',
+      firstName: '',
+      lastName: '',
       email: '',
       password: '',
       confirmPassword: '',
@@ -23,8 +24,10 @@ export default class UserSignUp extends React.Component {
           null
         }
         <form onSubmit={this.submit}>
-          <label htmlFor="name">Name</label>
-          <input onChange={this.change} type="text" id="name" name="name" />
+          <label htmlFor="firstName">First Name</label>
+          <input onChange={this.change} type="text" id="firstName" name="firstName" />
+          <label htmlFor="lastName">Last Name</label>
+          <input onChange={this.change} type="text" id="lastName" name="lastName" />
           <label htmlFor="email">Email Address</label>
           <input onChange={this.change} type="text" id="email" name="email" />
           <label htmlFor="password">Password</label>
@@ -52,13 +55,11 @@ export default class UserSignUp extends React.Component {
   submit = (e) => {
     e.preventDefault();
     const { context } = this.props;
-    const {name, email, password, confirmPassword} = this.state;
-
-    const nameSplit = name.split(' ');
+    const {firstName, lastName, email, password, confirmPassword} = this.state;
     if(password.normalize() === confirmPassword.normalize()) {
       const user = {
-        firstName: nameSplit[0] || '',
-        lastName: nameSplit[1] || '',
+        firstName,
+        lastName,
         emailAddress: email,
         password
       }
